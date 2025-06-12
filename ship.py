@@ -11,6 +11,7 @@ class Ship:
         self.settings = ai_game.settings
         # access screen's rect (or rectangle) attribute
         # -> later can place the ship in the correct location on the screen
+        # ai_game: instance - connect with main.py when this instance is created in main file
         self.screen_rect = ai_game.screen.get_rect()
 
         # Load the ship image and get its rect -> return a surface representing the ship

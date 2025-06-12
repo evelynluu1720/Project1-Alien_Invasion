@@ -3,6 +3,7 @@ import pygame # type: ignore
 
 from settings import Settings
 from ship import Ship
+from bullet import Bullet
 
 class AlienInvasion:
     '''Overall class to manage game assets and behavior'''
@@ -39,9 +40,8 @@ class AlienInvasion:
         # -> give access to the game's resources (ie. screen object)
         self.ship = Ship(self)
 
-        # Set background color, black as default
-        # colors in Pygame are specified as RGB colors (red-green-blue), ranging from 0 to 255
-        self.bg_color = (230, 230, 230)
+        # create a group that holds the bullets
+        self.bullets = pygame.sprite.Group()
 
     def run_game(self):
         '''Start the main loop for the game'''
@@ -50,6 +50,7 @@ class AlienInvasion:
             # adding a helper method
             self._check_events()
             self.ship.update()
+            self._update_bullets()
             self._update_screen()
 
             # make the clock tick at the end of a while loop
@@ -86,6 +87,8 @@ class AlienInvasion:
         # press Q for quit
         elif event.key == pygame.K_q:
             sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
 
     def _check_keyup_events(self, event):
         '''Respond to key releases'''
@@ -94,11 +97,39 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
 
+    def _fire_bullet(self):
+        '''Create a new bullet and ad it to the bullets group'''
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            # add() is similar to append() but specifically for Pygame groups
+            self.bullets.add(new_bullet)
+
+    def _update_bullets(self):
+        '''Update position of bullets and get rid of old bullets'''
+        # Update bullet positions - when calls update() on a group 
+        # -> automatically calls update() for each sprite in the group
+        self.bullets.update()
+        # Get rid of bullets that have disappeared
+        # we can't remove items from a list or group within a for loop -> have to loop over a copy
+        # -> free to modify the bullet group
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+        # check for number of bullets on screen
+        # print(len(self.bullets))
+
     def _update_screen(self):
         '''Update images on the screen and flip to the new screen'''
         # Redraw the screen during each pass through the loop
         # .fill() -> fill the screen with background color, acts on a surface and takes one arg (a color)
         self.screen.fill(self.settings.bg_color)
+
+        # each bullet is drawn to the screen
+        # bullets.sprites(): return a list of all sprites in the group bullets
+        # to draw all bullets -> loop through the sprites in <bullets> ...
+        # ... and call draw_bullet() on each one
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
 
         # Call blitme() -> draw image of ship at bottom center of screen
         self.ship.blitme()
