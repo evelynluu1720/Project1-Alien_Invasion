@@ -21,7 +21,7 @@ class Bullet(Sprite):
                                 self.settings.bullet_height)
         
         # bullet will emerge from top of the ship
-        self.rect.midtop = ai_game.ship.ship_rect.midtop
+        self.rect.midtop = ai_game.ship.rect.midtop
 
         # Store the bullet's position as a float - bullet will be shot upwards
         self.y = float(self.rect.y)
