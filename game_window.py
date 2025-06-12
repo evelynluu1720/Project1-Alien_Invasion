@@ -19,12 +19,20 @@ class AlienInvasion:
         self.clock = pygame.time.Clock()
         self.settings = Settings()
 
+        # Full screen mode
+        # pygame.FULLSCREEN: figure out a window size that will fill the screen
+        self.screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        self.settings.screen_width = self.screen.get_rect().width
+        self.settings.screen_height = self.screen.get_rect().height
+
         # Create a display window, (1200,800) is the dimensions of game window
         # 1200 pixels wide by 800 pixels high
         # the object we assign to self.screen is a surface - game elements can be display
-        self.screen = pygame.display.set_mode(
-            (self.settings.screen_width, self.settings.screen_height)
-        )
+
+        # Custom mode
+        # self.screen = pygame.display.set_mode(
+        #     (self.settings.screen_width, self.settings.screen_height)
+        # )
         pygame.display.set_caption("Alien Invasion")
 
         # Call the ship - arg self refers to the current instance of AI
@@ -41,6 +49,7 @@ class AlienInvasion:
         while True:
             # adding a helper method
             self._check_events()
+            self.ship.update()
             self._update_screen()
 
             # make the clock tick at the end of a while loop
@@ -58,6 +67,32 @@ class AlienInvasion:
             if event.type == pygame.QUIT:
                 # call sys.exit() to exit the game
                 sys.exit()
+            # press key - this pair will allow continuous motion
+            elif event.type == pygame.KEYDOWN:
+                self._check_keydown_events(event)
+            # release key
+            elif event.type == pygame.KEYUP:
+                self._check_keyup_events(event)
+
+    def _check_keydown_events(self, event):
+        '''Respond to key presses'''
+        # check whether key pressed is right arrow key
+        if event.key == pygame.K_RIGHT:
+            # Move the ship to the right
+            self.ship.moving_right = True
+        # can use elif here because each event is connected to only one key - keydown
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        # press Q for quit
+        elif event.key == pygame.K_q:
+            sys.exit()
+
+    def _check_keyup_events(self, event):
+        '''Respond to key releases'''
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
 
     def _update_screen(self):
         '''Update images on the screen and flip to the new screen'''
