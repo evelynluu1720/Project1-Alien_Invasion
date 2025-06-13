@@ -1,11 +1,13 @@
 import pygame # type: ignore
+from pygame.sprite import Sprite # type: ignore
 
-class Ship:
+class Ship(Sprite):
     '''A class to manage the ship'''
 
     # ai_game: reference to the current instance of AI class
     def __init__(self, ai_game):
         '''Initialize the ship and set its starting position'''
+        super().__init__()
         # assign the screen to an attribute of Ship
         self.screen = ai_game.screen
         self.settings = ai_game.settings
